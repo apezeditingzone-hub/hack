@@ -4,26 +4,28 @@ import FeatureBadge from './FeatureBadge';
 
 export default function LeftBranding() {
   const highlights = [
-    { icon: PieChart, title: 'Smart Portfolio Optimization' },
+    { icon: PieChart, title: 'Smart Capital Optimization' },
     { icon: ShieldCheck, title: 'Real-Time Risk Controls' },
-    { icon: Activity, title: 'Scenario & Stress Testing' },
+    { icon: Activity, title: 'Macro Scenario & Stress Testing' },
   ];
 
   return (
     <div className="branding-section">
       <div className="brand-logo-heading">
         <div className="brand-icon-box">
-          <Layers size={26} color="#FFFFFF" />
+          <ShieldCheck size={26} color="#FFFFFF" />
         </div>
-        <span className="brand-name">FinOpt</span>
+        <span className="brand-name">
+          Capital<span style={{ color: '#FF5B37' }}>X</span>
+        </span>
       </div>
 
-      <div className="brand-badge">Asset & Capital Management</div>
+      <div className="brand-badge">Autonomous Treasury Platform</div>
 
       <div className="branding-titles">
-        <h1>Intelligent Capital.<br />Controlled Risk.</h1>
+        <h1>Optimize Capital.<br />Control Your Risk.</h1>
         <p className="brand-description">
-          Optimize capital allocation, monitor portfolio risk, and make data-driven financial decisions with intelligent automation.
+          Seamlessly manage corporate cash, dynamically optimize multi-asset yield curves, and enforce non-negotiable risk limits with autonomous AI.
         </p>
       </div>
 
