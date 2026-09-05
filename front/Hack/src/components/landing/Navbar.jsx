@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShieldCheck, 
   Menu, 
   X, 
   Sparkles,
   User,
-  LogOut
+  LogOut,
+  LayoutDashboard,
+  Briefcase,
+  TrendingUp,
+  DollarSign,
+  BarChart2
 } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../../services/authService';
 
@@ -15,6 +20,7 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const session = getCurrentUser();
@@ -45,6 +51,14 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
     navigate('/');
   };
 
+  const navItems = [
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Portfolio', path: '/portfolio', icon: Briefcase },
+    { label: 'Live Market', path: '/live-market', icon: TrendingUp },
+    { label: 'Purchase Stocks', path: '/purchase-stocks', icon: DollarSign },
+    { label: 'Analytics', path: '/analytics', icon: BarChart2 },
+  ];
+
   return (
     <header 
       style={{
@@ -52,17 +66,17 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
         top: 0,
         zIndex: 50,
         width: '100%',
-        backgroundColor: scrolled ? 'rgba(240, 243, 248, 0.92)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(16px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
-        borderBottom: scrolled ? '1px solid #E2E8F0' : '1px solid transparent',
+        backgroundColor: scrolled ? 'rgba(240, 243, 248, 0.95)' : 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #E2E8F0',
         transition: 'all 0.3s ease'
       }}
     >
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
         
         {/* Brand Logo matching clean pill emblem */}
-        <a href="/landing" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+        <a href="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
           <div 
             style={{
               width: '38px',
@@ -87,46 +101,62 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
           </div>
         </a>
 
-        {/* Center Search / Navigation Pill */}
+        {/* Center 5 Options Navigation Pill */}
         <nav 
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '1.5rem',
+            gap: '0.4rem',
             background: '#FFFFFF',
-            padding: '0.45rem 1.4rem',
+            padding: '0.35rem 0.6rem',
             borderRadius: '9999px',
             border: '1px solid #E2E8F0',
             boxShadow: '0 2px 10px rgba(15, 23, 42, 0.03)'
           }}
           className="desktop-nav"
         >
-          <a href="#overview" style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#FF5B37'} onMouseLeave={e => e.target.style.color = '#475569'}>Platform</a>
-          <a href="#features" style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#FF5B37'} onMouseLeave={e => e.target.style.color = '#475569'}>Features</a>
-          <button 
-            onClick={() => navigate('/safeguards')}
-            style={{
-              background: 'rgba(255, 91, 55, 0.08)',
-              border: '1px solid rgba(255, 91, 55, 0.25)',
-              color: '#FF5B37',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              padding: '0.35rem 0.85rem',
-              borderRadius: '9999px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#FF5B37'; e.currentTarget.style.color = '#FFFFFF'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 91, 55, 0.08)'; e.currentTarget.style.color = '#FF5B37'; }}
-          >
-            <ShieldCheck size={14} />
-            <span>Risk Controls & Safeguards</span>
-          </button>
-          <a href="#visualization" style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#FF5B37'} onMouseLeave={e => e.target.style.color = '#475569'}>Analytics</a>
-          <a href="#security" style={{ color: '#475569', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={e => e.target.style.color = '#FF5B37'} onMouseLeave={e => e.target.style.color = '#475569'}>Enterprise</a>
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || 
+              (item.path === '/dashboard' && (location.pathname === '/landing' || location.pathname === '/home'));
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.label}
+                onClick={() => navigate(item.path)}
+                style={{
+                  background: isActive ? '#09101D' : 'transparent',
+                  color: isActive ? '#FFFFFF' : '#475569',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.88rem',
+                  fontWeight: isActive ? 800 : 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  boxShadow: isActive ? '0 2px 8px rgba(9, 16, 29, 0.2)' : 'none',
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = '#FF5B37';
+                    e.currentTarget.style.background = 'rgba(255, 91, 55, 0.06)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = '#475569';
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+              >
+                <Icon size={15} color={isActive ? '#FF5B37' : 'currentColor'} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
         {/* Action Buttons */}
@@ -214,12 +244,12 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
           )}
           
           <button 
-            onClick={onOpenDemo}
+            onClick={() => navigate('/safeguards')}
             className="btn-coral"
-            style={{ padding: '0.6rem 1.35rem', fontSize: '0.88rem' }}
+            style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            <Sparkles size={15} />
-            <span>Schedule Demo +</span>
+            <ShieldCheck size={16} />
+            <span>Safeguards</span>
           </button>
         </div>
 
@@ -250,35 +280,64 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
             borderBottom: '1px solid #E2E8F0',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1.25rem',
+            gap: '0.85rem',
             boxShadow: '0 10px 25px rgba(0,0,0,0.05)'
           }}
         >
-          <a onClick={() => setMobileMenuOpen(false)} href="#overview" style={{ color: '#0F172A', textDecoration: 'none', fontSize: '1rem', fontWeight: 600 }}>Platform</a>
-          <a onClick={() => setMobileMenuOpen(false)} href="#features" style={{ color: '#0F172A', textDecoration: 'none', fontSize: '1rem', fontWeight: 600 }}>Features</a>
-          <button
-            onClick={() => { setMobileMenuOpen(false); navigate('/safeguards'); }}
-            style={{
-              background: 'rgba(255, 91, 55, 0.1)',
-              border: '1px solid #FF5B37',
-              color: '#FF5B37',
-              padding: '0.6rem 1rem',
-              borderRadius: '10px',
-              fontSize: '0.95rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <ShieldCheck size={16} />
-            <span>Risk Controls & Safeguards</span>
-          </button>
-          <a onClick={() => setMobileMenuOpen(false)} href="#visualization" style={{ color: '#0F172A', textDecoration: 'none', fontSize: '1rem', fontWeight: 600 }}>Live Visualization</a>
-          <a onClick={() => setMobileMenuOpen(false)} href="#security" style={{ color: '#0F172A', textDecoration: 'none', fontSize: '1rem', fontWeight: 600 }}>Enterprise Security</a>
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.label}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate(item.path);
+                }}
+                style={{
+                  background: isActive ? '#09101D' : '#F8FAFC',
+                  color: isActive ? '#FFFFFF' : '#0F172A',
+                  border: '1px solid #E2E8F0',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '12px',
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  textAlign: 'left',
+                  width: '100%',
+                }}
+              >
+                <Icon size={18} color={isActive ? '#FF5B37' : '#64748B'} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+            <button
+              onClick={() => { setMobileMenuOpen(false); navigate('/safeguards'); }}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '10px',
+                background: 'rgba(255, 91, 55, 0.1)',
+                border: '1px solid #FF5B37',
+                fontWeight: 800,
+                color: '#FF5B37',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              <ShieldCheck size={18} />
+              <span>Risk Controls & Safeguards</span>
+            </button>
+
             {currentUser ? (
               <button 
                 onClick={() => { setMobileMenuOpen(false); handleSignOut(); }} 
@@ -317,20 +376,13 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                 Sign In / Client Portal
               </button>
             )}
-            <button 
-              onClick={() => { setMobileMenuOpen(false); onOpenDemo(); }} 
-              className="btn-coral"
-              style={{ width: '100%' }}
-            >
-              Schedule Demo +
-            </button>
           </div>
         </div>
       )}
 
       {/* Responsive media style injection */}
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 980px) {
           .desktop-nav, .desktop-actions {
             display: none !important;
           }

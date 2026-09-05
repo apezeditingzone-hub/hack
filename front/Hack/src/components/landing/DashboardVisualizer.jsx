@@ -147,24 +147,8 @@ export default function DashboardVisualizer({ onOpenDemo }) {
   };
 
   return (
-    <section id="visualization" style={{ padding: '3rem 0 5rem 0', position: 'relative' }}>
+    <section id="visualization" style={{ padding: '1rem 0 3rem 0', position: 'relative' }}>
       <div className="container">
-        
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 2.5rem auto' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-            <span className="badge-coral-subtle">
-              <Sparkles size={13} /> Live Intelligence Deck
-            </span>
-          </div>
-          <h2 style={{ fontSize: 'clamp(2rem, 3.2vw, 2.7rem)', letterSpacing: '-0.03em', marginBottom: '0.75rem', color: '#09101D' }}>
-            Autonomous Capital Optimization <span className="gradient-text-coral">Dashboard</span>
-          </h2>
-          <p style={{ color: '#64748B', fontSize: '1.02rem' }}>
-            A unified view of corporate liquidity, dynamic asset weights, automated risk limits, and real-time yield curves.
-          </p>
-        </div>
-
         {/* Dashboard Main Container Container styled like the reference app */}
         <div 
           style={{
