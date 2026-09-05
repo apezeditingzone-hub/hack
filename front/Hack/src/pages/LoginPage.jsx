@@ -12,7 +12,7 @@ export default function LoginPage({ onBackToHome }) {
     if (onBackToHome) {
       onBackToHome();
     } else {
-      navigate('/');
+      navigate('/landing');
     }
   };
 
