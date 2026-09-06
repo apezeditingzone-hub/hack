@@ -76,7 +76,7 @@ export function RiskSafeguardProvider({ children }) {
         setActiveMitigationSuggestion({
           title: 'Emergency Liquidity Injection',
           reason: `Liquid reserves (${currentLiquidity}%) fell below institutional floor (${limits.minLiquidityPercent}%).`,
-          recommendedStep: 'Sweep $15M from Corporate Paper and Market Yields into 100% liquid US T-Bills.',
+          recommendedStep: 'Sweep ₹15 Cr from Corporate Paper and Market Yields into 100% liquid RBI T-Bills.',
           actionKey: 'rebalance_liquidity',
         });
       } else if (isExposureBreached) {
@@ -97,7 +97,7 @@ export function RiskSafeguardProvider({ children }) {
         setActiveMitigationSuggestion({
           title: 'Autonomous Portfolio De-Risking',
           reason: `Portfolio Risk Score (${currentRiskScore}) breached safety threshold (${limits.criticalRiskScoreThreshold}).`,
-          recommendedStep: 'Execute Flight to Safety: Rebalance 40% of volatile yield into US Treasury Bills.',
+          recommendedStep: 'Execute Flight to Safety: Rebalance 40% of volatile yield into RBI Sovereign Treasury Bills.',
           actionKey: 'flight_to_safety',
         });
       }
@@ -207,7 +207,7 @@ export function RiskSafeguardProvider({ children }) {
       severity: 'safe',
       title: 'Emergency Liquidity Injection Executed',
       asset: 'Sovereign Cash & Prime Reserves',
-      message: `Injected $20M liquidity buffer into sovereign T-Bills. Instant liquidity restored to safe levels.`,
+      message: `Injected ₹20 Cr liquidity buffer into RBI sovereign T-Bills. Instant liquidity restored to safe levels.`,
       actionTaken: 'Liquidity reserve re-established above policy floor.',
       status: 'resolved',
       riskScoreAtTrigger: currentRiskScore,
@@ -302,6 +302,37 @@ export function RiskSafeguardProvider({ children }) {
     });
   }, [addIncidentLog]);
 
+  // Execute Live Stock / Bond Order & Update Portfolio Allocation
+  const executeLiveOrder = useCallback((order) => {
+    const isBuy = order.side === 'BUY';
+    const amountDelta = order.total;
+
+    setAssets((prev) => {
+      // Find matching asset category or default to high-beta alpha for equities / tbills for sovereign debt
+      const targetId = order.symbol.startsWith('IN91') || order.symbol.startsWith('IN10') ? 'tbills' : 'alpha_strat';
+      const updated = prev.map((asset) => {
+        if (asset.id === targetId) {
+          const newAmount = isBuy ? asset.amount + amountDelta : Math.max(1000000, asset.amount - amountDelta);
+          return { ...asset, amount: newAmount };
+        }
+        return asset;
+      });
+
+      const newTotal = calculateTotalAUM(updated);
+      return updated.map(a => ({ ...a, percentage: Math.round((a.amount / newTotal) * 1000) / 10 }));
+    });
+
+    addIncidentLog({
+      severity: 'safe',
+      title: `Institutional Order Executed: ${order.side} ${order.shares.toLocaleString('en-IN')} ${order.symbol}`,
+      asset: order.symbol,
+      message: `Settled ₹${order.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })} via Automated NSE/RBI Clearing Channel.`,
+      actionTaken: 'Portfolio liquidity, weights, and holdings updated across all dashboards.',
+      status: 'verified',
+      riskScoreAtTrigger: currentRiskScore,
+    });
+  }, [currentRiskScore, addIncidentLog]);
+
   // Update Limits
   const updateLimits = useCallback((newLimits) => {
     setLimits((prev) => ({ ...prev, ...newLimits }));
@@ -338,6 +369,7 @@ export function RiskSafeguardProvider({ children }) {
     executeFlightToSafety,
     executeLiquidityInjection,
     executeConcentrationTrim,
+    executeLiveOrder,
     triggerShockScenario,
     resetToSafeState,
     shockScenarios: SHOCK_SCENARIOS,

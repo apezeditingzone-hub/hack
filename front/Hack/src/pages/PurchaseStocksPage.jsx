@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/landing/Navbar';
 import { 
-  DollarSign, 
   TrendingUp, 
   ShieldCheck, 
   CheckCircle2, 
@@ -16,20 +15,21 @@ import {
 import { useRiskSafeguard } from '../context/RiskSafeguardContext';
 
 const TRADABLE_ASSETS = [
-  { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 128.45, type: 'Growth Equity', riskTier: 'High', yieldEst: '14.2% Return' },
-  { symbol: 'AAPL', name: 'Apple Inc.', price: 224.20, type: 'Large-Cap Tech', riskTier: 'Medium', yieldEst: '10.5% Return' },
-  { symbol: 'MSFT', name: 'Microsoft Corporation', price: 448.90, type: 'Large-Cap Tech', riskTier: 'Medium', yieldEst: '11.2% Return' },
-  { symbol: 'SPY', name: 'SPDR S&P 500 Index ETF', price: 552.30, type: 'Broad Market ETF', riskTier: 'Low-Medium', yieldEst: '9.8% Return' },
-  { symbol: 'QQQ', name: 'Invesco Nasdaq 100 ETF', price: 480.15, type: 'Tech Benchmark ETF', riskTier: 'Medium', yieldEst: '12.0% Return' },
-  { symbol: 'US03M', name: '3-Month US Treasury Bill', price: 100.00, type: 'Sovereign Cash Reserve', riskTier: 'Zero Risk', yieldEst: '5.25% APY' },
-  { symbol: 'US10Y', name: '10-Year US Treasury Bond', price: 98.50, type: 'Sovereign Fixed Income', riskTier: 'Low Risk', yieldEst: '4.28% APY' },
-  { symbol: 'JPM_CORP', name: 'JPMorgan IG Corporate Note', price: 102.10, type: 'Corporate Debt A/AAA', riskTier: 'Low Risk', yieldEst: '6.15% APY' },
+  { symbol: 'RELIANCE', name: 'Reliance Industries Ltd.', price: 3025.40, type: 'Large-Cap Energy & Tech', riskTier: 'Medium Risk', yieldEst: '15.4% Expected Return', exchange: 'NSE' },
+  { symbol: 'TCS', name: 'Tata Consultancy Services', price: 4520.10, type: 'Tier-1 IT Bluechip', riskTier: 'Low-Med Risk', yieldEst: '12.8% Expected Return', exchange: 'NSE' },
+  { symbol: 'HDFCBANK', name: 'HDFC Bank Ltd.', price: 1668.50, type: 'Top Banking Giant', riskTier: 'Low-Med Risk', yieldEst: '13.5% Expected Return', exchange: 'NSE' },
+  { symbol: 'INFY', name: 'Infosys Ltd.', price: 1945.30, type: 'IT Services & Cloud', riskTier: 'Medium Risk', yieldEst: '14.2% Expected Return', exchange: 'NSE' },
+  { symbol: 'ICICIBANK', name: 'ICICI Bank Ltd.', price: 1234.80, type: 'Private Sector Banking', riskTier: 'Medium Risk', yieldEst: '16.0% Expected Return', exchange: 'NSE' },
+  { symbol: 'TATAMOTORS', name: 'Tata Motors Ltd.', price: 1092.40, type: 'Automotive & EV Alpha', riskTier: 'High Risk', yieldEst: '18.5% Expected Return', exchange: 'NSE' },
+  { symbol: 'SBIN', name: 'State Bank of India', price: 826.90, type: 'PSU Sovereign Banking', riskTier: 'Low-Med Risk', yieldEst: '11.8% Expected Return', exchange: 'NSE' },
+  { symbol: 'IN91D', name: 'RBI 91-Day Sovereign T-Bill', price: 98.35, type: 'RBI Sovereign Cash Reserve', riskTier: 'Zero Risk (Sovereign)', yieldEst: '6.74% Sovereign Yield', exchange: 'RBI Repo' },
+  { symbol: 'IN10Y', name: 'India 10-Yr Government Bond (G-Sec)', price: 101.20, type: 'GoI Sovereign Fixed Income', riskTier: 'Zero Risk (Sovereign)', yieldEst: '6.86% Annual Coupon', exchange: 'RBI G-Sec' },
 ];
 
 export default function PurchaseStocksPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { totalAUM, assets, addIncidentLog } = useRiskSafeguard();
+  const { totalAUM, assets, executeLiveOrder } = useRiskSafeguard();
 
   const [selectedAsset, setSelectedAsset] = useState(() => {
     const passed = location.state?.symbol;
@@ -44,14 +44,14 @@ export default function PurchaseStocksPage() {
   const [orderSuccess, setOrderSuccess] = useState(null);
 
   const [orderHistory, setOrderHistory] = useState([
-    { id: 'ORD-9841', timestamp: 'Today, 11:20 AM', symbol: 'US03M', side: 'BUY', shares: 50000, price: 100.00, total: 5000000, status: 'FILLED' },
-    { id: 'ORD-9838', timestamp: 'Yesterday, 03:45 PM', symbol: 'SPY', side: 'BUY', shares: 2000, price: 549.80, total: 1099600, status: 'FILLED' },
-    { id: 'ORD-9812', timestamp: 'Aug 28, 09:15 AM', symbol: 'NVDA', side: 'SELL', shares: 1500, price: 125.10, total: 187650, status: 'FILLED' },
+    { id: 'ORD-9841', timestamp: 'Today, 11:20 AM', symbol: 'IN91D', side: 'BUY', shares: 50000, price: 98.35, total: 4917500, status: 'FILLED' },
+    { id: 'ORD-9838', timestamp: 'Yesterday, 03:45 PM', symbol: 'RELIANCE', side: 'BUY', shares: 500, price: 3012.50, total: 1506250, status: 'FILLED' },
+    { id: 'ORD-9812', timestamp: 'Aug 28, 09:15 AM', symbol: 'TCS', side: 'BUY', shares: 200, price: 4490.00, total: 898000, status: 'FILLED' },
   ]);
 
   const effectivePrice = orderType === 'limit' ? (limitPrice || selectedAsset.price) : selectedAsset.price;
   const totalOrderValue = shares * effectivePrice;
-  const estimatedCashReserve = 35000000;
+  const estimatedCashReserve = 350000000; // ₹35 Cr
 
   const handleAssetSelect = (asset) => {
     setSelectedAsset(asset);
@@ -81,16 +81,7 @@ export default function PurchaseStocksPage() {
 
       setOrderHistory(prev => [newOrder, ...prev]);
       setOrderSuccess(newOrder);
-
-      addIncidentLog({
-        severity: 'safe',
-        title: `Institutional Order Executed: ${newOrder.side} ${newOrder.shares} ${newOrder.symbol}`,
-        asset: selectedAsset.name,
-        message: `Settled $${newOrder.total.toLocaleString()} via Automated Treasury Execution Channel.`,
-        actionTaken: 'Portfolio liquidity and holdings updated immediately.',
-        status: 'verified',
-        riskScoreAtTrigger: 26.4,
-      });
+      executeLiveOrder(newOrder);
     }, 1200);
   };
 
@@ -98,27 +89,27 @@ export default function PurchaseStocksPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
       <Navbar />
 
-      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '2rem 1.5rem 4rem 1.5rem' }}>
+      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '6.85rem 1.5rem 4rem 1.5rem' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255, 91, 55, 0.1)', color: '#FF5B37', padding: '3px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               <Zap size={13} />
-              <span>Institutional Execution Terminal</span>
+              <span>Institutional NSE / BSE Execution Terminal (₹ INR)</span>
             </div>
             <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-              Purchase Stocks & Treasury Assets
+              Purchase Indian Stocks & Sovereign G-Sec
             </h1>
             <p style={{ color: '#64748B', fontSize: '0.92rem', margin: '4px 0 0 0' }}>
-              Direct market access, automated algorithmic routing, and real-time settlement.
+              Direct market access to National Stock Exchange (NSE), BSE, and Reserve Bank of India Sovereign bonds.
             </p>
           </div>
 
           <div style={{ background: '#FFFFFF', padding: '0.65rem 1.25rem', borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
             <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Available Buying Power</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10B981' }}>
-              ${(estimatedCashReserve / 1000000).toFixed(2)}M Cash
+              ₹{(estimatedCashReserve / 10000000).toFixed(2)} Cr Cash
             </div>
           </div>
         </div>
@@ -130,10 +121,10 @@ export default function PurchaseStocksPage() {
           <div style={{ background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>
               <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: '0 0 0.5rem 0' }}>
-                1. Select Asset / Security
+                1. Select Indian Asset / Stock
               </h2>
               <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748B' }}>
-                Choose an equity, ETF, or sovereign fixed income security to trade
+                Choose an NSE equity, index benchmark, or RBI sovereign bond to trade
               </p>
             </div>
 
@@ -160,6 +151,7 @@ export default function PurchaseStocksPage() {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontWeight: 900, color: '#0F172A', fontSize: '0.95rem' }}>{asset.symbol}</span>
+                        <span style={{ fontSize: '0.72rem', background: '#E2E8F0', padding: '2px 5px', borderRadius: '4px', color: '#475569', fontWeight: 700 }}>{asset.exchange}</span>
                         <span style={{ fontSize: '0.75rem', color: '#64748B' }}>• {asset.type}</span>
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: '2px' }}>
@@ -169,7 +161,7 @@ export default function PurchaseStocksPage() {
 
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '0.95rem' }}>
-                        ${asset.price.toFixed(2)}
+                        ₹{asset.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                       <div style={{ fontSize: '0.72rem', color: '#10B981', fontWeight: 700 }}>
                         {asset.yieldEst}
@@ -236,7 +228,7 @@ export default function PurchaseStocksPage() {
                       Order Executed: {orderSuccess.id}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#047857' }}>
-                      {orderSuccess.side} {orderSuccess.shares.toLocaleString()} {orderSuccess.symbol} @ ${orderSuccess.price.toFixed(2)} (Total: ${orderSuccess.total.toLocaleString()})
+                      {orderSuccess.side} {orderSuccess.shares.toLocaleString('en-IN')} {orderSuccess.symbol} @ ₹{orderSuccess.price.toFixed(2)} (Total: ₹{orderSuccess.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })})
                     </div>
                   </div>
                 </div>
@@ -308,11 +300,11 @@ export default function PurchaseStocksPage() {
                 {orderType === 'limit' && (
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
-                      Limit Price ($)
+                      Limit Price (₹)
                     </label>
                     <input
                       type="number"
-                      step="0.01"
+                      step="0.05"
                       value={limitPrice}
                       onChange={(e) => setLimitPrice(parseFloat(e.target.value) || 0)}
                       style={{
@@ -332,15 +324,15 @@ export default function PurchaseStocksPage() {
                 <div style={{ background: '#F8FAFC', padding: '1rem', borderRadius: '12px', border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
                     <span>Estimated Unit Price:</span>
-                    <strong style={{ color: '#0F172A' }}>${effectivePrice.toFixed(2)}</strong>
+                    <strong style={{ color: '#0F172A' }}>₹{effectivePrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
                     <span>Estimated Total Value:</span>
-                    <strong style={{ color: '#0F172A', fontSize: '1.05rem', fontWeight: 900 }}>${totalOrderValue.toLocaleString()}</strong>
+                    <strong style={{ color: '#0F172A', fontSize: '1.05rem', fontWeight: 900 }}>₹{totalOrderValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748B' }}>
-                    <span>Estimated Settlement Fee:</span>
-                    <strong style={{ color: '#10B981' }}>$0.00 (Institutional Zero Fee)</strong>
+                    <span>Exchange Clearing & Brokerage:</span>
+                    <strong style={{ color: '#10B981' }}>₹0.00 (Institutional Zero Fee)</strong>
                   </div>
                 </div>
 
@@ -368,8 +360,8 @@ export default function PurchaseStocksPage() {
                   <Zap size={16} />
                   <span>
                     {isExecuting
-                      ? 'Routing Order through Clearing...'
-                      : `Execute ${orderSide.toUpperCase()} Order for ${shares} ${selectedAsset.symbol}`}
+                      ? 'Routing Order through NSE Clearing...'
+                      : `Execute ${orderSide.toUpperCase()} Order for ${shares.toLocaleString('en-IN')} ${selectedAsset.symbol}`}
                   </span>
                 </button>
 
@@ -383,7 +375,7 @@ export default function PurchaseStocksPage() {
         {/* Recent Execution History */}
         <div style={{ background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0', padding: '1.75rem' }}>
           <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: '0 0 1rem 0' }}>
-            Recent Trade Execution Ledger
+            Recent Trade Execution Ledger (₹ INR)
           </h2>
 
           <div style={{ overflowX: 'auto' }}>
@@ -396,7 +388,7 @@ export default function PurchaseStocksPage() {
                   <th style={{ padding: '0.85rem 1rem' }}>Action</th>
                   <th style={{ padding: '0.85rem 1rem' }}>Quantity</th>
                   <th style={{ padding: '0.85rem 1rem' }}>Execution Price</th>
-                  <th style={{ padding: '0.85rem 1rem' }}>Total Settled</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Total Settled (₹)</th>
                   <th style={{ padding: '0.85rem 1rem' }}>Clearing Status</th>
                 </tr>
               </thead>
@@ -411,9 +403,9 @@ export default function PurchaseStocksPage() {
                         {ord.side}
                       </span>
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', fontWeight: 700 }}>{ord.shares.toLocaleString()}</td>
-                    <td style={{ padding: '0.85rem 1rem' }}>${ord.price.toFixed(2)}</td>
-                    <td style={{ padding: '0.85rem 1rem', fontWeight: 800 }}>${ord.total.toLocaleString()}</td>
+                    <td style={{ padding: '0.85rem 1rem', fontWeight: 700 }}>{ord.shares.toLocaleString('en-IN')}</td>
+                    <td style={{ padding: '0.85rem 1rem' }}>₹{ord.price.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td style={{ padding: '0.85rem 1rem', fontWeight: 800 }}>₹{ord.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</td>
                     <td style={{ padding: '0.85rem 1rem' }}>
                       <span style={{ background: '#ECFDF5', color: '#059669', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 800 }}>
                         {ord.status}

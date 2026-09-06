@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layers, LogOut, TrendingUp, ShieldAlert, DollarSign, Activity } from 'lucide-react';
+import { Layers, LogOut, TrendingUp, ShieldAlert, Activity } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../services/authService';
 
 export default function DashboardPage() {
@@ -22,7 +22,7 @@ export default function DashboardPage() {
           <span>FinOpt Dashboard</span>
         </div>
 
-        <button className="logout-btn" onClick={handleLogout} display="flex">
+        <button className="logout-btn" onClick={handleLogout} style={{ display: 'flex', alignItems: 'center' }}>
           <LogOut size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
           Sign Out
         </button>
@@ -42,9 +42,9 @@ export default function DashboardPage() {
           <div className="dash-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>Total Assets Under Management</span>
-              <DollarSign size={20} color="#60A5FA" />
+              <span style={{ color: '#60A5FA', fontWeight: 900 }}>₹</span>
             </div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>$142,850,000</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>₹142.85 Cr</div>
             <div style={{ color: '#10B981', fontSize: '0.875rem', marginTop: '0.5rem' }}>+4.2% vs last month</div>
           </div>
 

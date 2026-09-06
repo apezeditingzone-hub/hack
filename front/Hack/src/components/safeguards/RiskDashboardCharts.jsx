@@ -53,7 +53,9 @@ export default function RiskDashboardCharts() {
   ];
 
   const formatCurrency = (val) => {
-    return `$${(val / 1000000).toFixed(1)}M`;
+    if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
+    if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
+    return `₹${Number(val).toLocaleString('en-IN')}`;
   };
 
   return (

@@ -1,22 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/landing/Navbar';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area
+import { 
+  LineChart, 
+  Line, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
 } from 'recharts';
 import { 
   TrendingUp, 
-  Activity, 
   ShieldCheck, 
   Layers, 
   ArrowUpRight, 
@@ -28,23 +25,23 @@ import {
 import { useRiskSafeguard } from '../context/RiskSafeguardContext';
 
 const MONTE_CARLO_DATA = [
-  { confidence: '99.9% Worst Case', returnPct: -2.8, varAmount: '-$4.0M' },
-  { confidence: '99.0% VaR', returnPct: -1.9, varAmount: '-$2.7M' },
-  { confidence: '95.0% Baseline Risk', returnPct: -0.8, varAmount: '-$1.1M' },
-  { confidence: '50.0% Median Expected', returnPct: +6.4, varAmount: '+$9.1M' },
-  { confidence: '90.0% Bull Case', returnPct: +11.2, varAmount: '+$16.0M' },
-  { confidence: '99.0% Max Upside', returnPct: +15.8, varAmount: '+$22.5M' },
+  { confidence: '99.9% Worst Case', returnPct: -2.8, varAmount: '-₹4.0 Cr' },
+  { confidence: '99.0% VaR', returnPct: -1.9, varAmount: '-₹2.7 Cr' },
+  { confidence: '95.0% Baseline Risk', returnPct: -0.8, varAmount: '-₹1.1 Cr' },
+  { confidence: '50.0% Median Expected', returnPct: +6.4, varAmount: '+₹9.1 Cr' },
+  { confidence: '90.0% Bull Case', returnPct: +11.2, varAmount: '+₹16.0 Cr' },
+  { confidence: '99.0% Max Upside', returnPct: +15.8, varAmount: '+₹22.5 Cr' },
 ];
 
 const YIELD_CURVE_DATA = [
-  { term: '1M', current: 5.30, projectedCut: 4.80, hawkishSpike: 5.80 },
-  { term: '3M', current: 5.25, projectedCut: 4.70, hawkishSpike: 5.75 },
-  { term: '6M', current: 5.10, projectedCut: 4.50, hawkishSpike: 5.60 },
-  { term: '1Y', current: 4.85, projectedCut: 4.20, hawkishSpike: 5.40 },
-  { term: '2Y', current: 4.45, projectedCut: 3.90, hawkishSpike: 5.10 },
-  { term: '5Y', current: 4.15, projectedCut: 3.75, hawkishSpike: 4.90 },
-  { term: '10Y', current: 4.28, projectedCut: 3.85, hawkishSpike: 5.05 },
-  { term: '30Y', current: 4.55, projectedCut: 4.10, hawkishSpike: 5.25 },
+  { term: '1M', current: 6.65, projectedCut: 6.15, hawkishSpike: 7.15 },
+  { term: '3M', current: 6.74, projectedCut: 6.20, hawkishSpike: 7.25 },
+  { term: '6M', current: 6.80, projectedCut: 6.25, hawkishSpike: 7.30 },
+  { term: '1Y', current: 6.82, projectedCut: 6.30, hawkishSpike: 7.35 },
+  { term: '2Y', current: 6.84, projectedCut: 6.35, hawkishSpike: 7.40 },
+  { term: '5Y', current: 6.85, projectedCut: 6.40, hawkishSpike: 7.45 },
+  { term: '10Y', current: 6.86, projectedCut: 6.45, hawkishSpike: 7.50 },
+  { term: '30Y', current: 7.05, projectedCut: 6.60, hawkishSpike: 7.70 },
 ];
 
 export default function AnalyticsPage() {
@@ -55,20 +52,20 @@ export default function AnalyticsPage() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
       <Navbar />
 
-      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '2rem 1.5rem 4rem 1.5rem' }}>
+      <main style={{ flex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%', padding: '6.85rem 1.5rem 4rem 1.5rem' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(99, 102, 241, 0.1)', color: '#6366F1', padding: '3px 10px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               <BarChart2 size={13} />
-              <span>Quantitative Risk & Predictive Intelligence</span>
+              <span>Quantitative Risk & Predictive Intelligence (India Markets)</span>
             </div>
             <h1 style={{ fontSize: '2rem', fontWeight: 900, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-              Institutional Analytics & Modeling
+              Indian Institutional Analytics & Modeling
             </h1>
             <p style={{ color: '#64748B', fontSize: '0.92rem', margin: '4px 0 0 0' }}>
-              Multi-scenario Monte Carlo simulations, yield curve forecasts, and factor attribution.
+              Multi-scenario Monte Carlo simulations, RBI G-Sec yield curve forecasts, and factor attribution.
             </p>
           </div>
 
@@ -109,7 +106,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div style={{ background: '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: '1px solid #E2E8F0' }}>
-            <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 700 }}>PORTFOLIO BETA (vs S&P 500)</div>
+            <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 700 }}>PORTFOLIO BETA (vs NIFTY 50)</div>
             <div style={{ fontSize: '2rem', fontWeight: 900, color: '#0F172A', marginTop: '4px' }}>0.38</div>
             <div style={{ fontSize: '0.78rem', color: '#10B981', fontWeight: 700, marginTop: '4px' }}>62% Lower Volatility</div>
           </div>
@@ -130,10 +127,10 @@ export default function AnalyticsPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  US Sovereign Yield Curve Scenario Forecast
+                  India Sovereign G-Sec Yield Curve Scenario Forecast
                 </h2>
                 <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
-                  Forward yield shift projections under 3 macro interest rate scenarios
+                  Forward RBI yield shift projections under 3 macro interest rate scenarios
                 </p>
               </div>
             </div>
@@ -143,22 +140,22 @@ export default function AnalyticsPage() {
                 <LineChart data={YIELD_CURVE_DATA} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                   <XAxis dataKey="term" tick={{ fontSize: 11, fill: '#64748B' }} />
-                  <YAxis domain={[3, 7]} unit="%" tick={{ fontSize: 11, fill: '#94A3B8' }} />
+                  <YAxis domain={[5.5, 8.5]} unit="%" tick={{ fontSize: 11, fill: '#94A3B8' }} />
                   <Tooltip
                     contentStyle={{ background: '#0F172A', borderRadius: '10px', color: '#FFFFFF', fontSize: '0.8rem' }}
                     formatter={(val) => [`${val}%`, 'Yield']}
                   />
-                  <Line type="monotone" dataKey="current" stroke="#3B82F6" strokeWidth={3} name="Current Curve" dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="projectedCut" stroke="#10B981" strokeWidth={2} strokeDasharray="4 4" name="-50bps Rate Cut" />
+                  <Line type="monotone" dataKey="current" stroke="#3B82F6" strokeWidth={3} name="Current RBI Curve" dot={{ r: 4 }} />
+                  <Line type="monotone" dataKey="projectedCut" stroke="#10B981" strokeWidth={2} strokeDasharray="4 4" name="-50bps RBI Repo Cut" />
                   <Line type="monotone" dataKey="hawkishSpike" stroke="#EF4444" strokeWidth={2} strokeDasharray="3 3" name="+50bps Hawkish Shock" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '10px', fontSize: '0.78rem', fontWeight: 700 }}>
-              <span style={{ color: '#3B82F6' }}>● Current Curve</span>
-              <span style={{ color: '#10B981' }}>- - Rate Cut Scenario</span>
-              <span style={{ color: '#EF4444' }}>- - Hawkish Shock</span>
+              <span style={{ color: '#3B82F6' }}>● Current RBI Curve</span>
+              <span style={{ color: '#10B981' }}>- - Repo Cut Scenario</span>
+              <span style={{ color: '#EF4444' }}>- - Hawkish Spike</span>
             </div>
           </div>
 
@@ -167,10 +164,10 @@ export default function AnalyticsPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  Monte Carlo 10,000-Run Probability Distribution
+                  Monte Carlo 10,000-Run Probability Distribution (₹ INR)
                 </h2>
                 <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>
-                  Projected 1-year treasury return and downside value-at-risk distribution
+                  Projected 1-year treasury return and downside value-at-risk distribution in ₹ Crores
                 </p>
               </div>
             </div>
