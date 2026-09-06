@@ -119,23 +119,13 @@ export default function AlertHistoryTable() {
           </div>
 
           {/* Severity Filter Tabs */}
-          <div style={{ display: 'flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', gap: '2px' }}>
+          <div className="segmented-filter-bar">
             {['all', 'critical', 'warning', 'safe'].map((sev) => (
               <button
                 key={sev}
+                type="button"
                 onClick={() => setFilterSeverity(sev)}
-                style={{
-                  background: filterSeverity === sev ? '#FFFFFF' : 'transparent',
-                  border: 'none',
-                  padding: '0.35rem 0.65rem',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: filterSeverity === sev ? 800 : 600,
-                  color: filterSeverity === sev ? '#0F172A' : '#64748B',
-                  cursor: 'pointer',
-                  textTransform: 'capitalize',
-                  boxShadow: filterSeverity === sev ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
-                }}
+                className={`filter-tab-btn ${filterSeverity === sev ? 'active' : ''}`}
               >
                 {sev}
               </button>

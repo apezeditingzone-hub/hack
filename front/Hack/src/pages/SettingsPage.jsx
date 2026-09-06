@@ -26,13 +26,15 @@ import {
   RefreshCw,
   ExternalLink,
   Activity,
-  AlertTriangle
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react';
 import { getCurrentUser, logoutUser } from '../services/authService';
 import { 
   getMarketApiConfig, 
   saveMarketApiConfig, 
-  testMarketApiKey 
+  testMarketApiKey,
+  OFFICIAL_PROVIDER_KEYS 
 } from '../services/marketApiService';
 
 export default function SettingsPage() {
@@ -51,10 +53,9 @@ export default function SettingsPage() {
   const [telemetryAlerts, setTelemetryAlerts] = useState(true);
   const [soundAlerts, setSoundAlerts] = useState(true);
 
-  // Market API Key Configuration State
+  // Market API Key Configuration State (Locked to Given Official Verified Options Only)
   const [apiProvider, setApiProvider] = useState('twelvedata');
-  const [apiKey, setApiKey] = useState('');
-  const [customEndpoint, setCustomEndpoint] = useState('');
+  const [apiKey, setApiKey] = useState(OFFICIAL_PROVIDER_KEYS.twelvedata.key);
   const [showApiKey, setShowApiKey] = useState(false);
   const [isTestingApi, setIsTestingApi] = useState(false);
   const [apiTestResult, setApiTestResult] = useState(null);
@@ -62,7 +63,7 @@ export default function SettingsPage() {
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
   const [isLoggedOutMessage, setIsLoggedOutMessage] = useState(false);
 
-  // Load stored user data & API Key from localStorage on mount
+  // Load stored user data & API Key on mount
   useEffect(() => {
     // Check auth session
     const session = getCurrentUser();
@@ -90,26 +91,37 @@ export default function SettingsPage() {
       // fallback to defaults
     }
 
-    // Load Market API config
+    // Load Market API config (locking to given official options)
     const apiCfg = getMarketApiConfig();
-    if (apiCfg) {
-      setApiProvider(apiCfg.provider || 'twelvedata');
-      setApiKey(apiCfg.apiKey || '');
-      setCustomEndpoint(apiCfg.customEndpoint || '');
+    if (apiCfg && OFFICIAL_PROVIDER_KEYS[apiCfg.provider]) {
+      setApiProvider(apiCfg.provider);
+      setApiKey(OFFICIAL_PROVIDER_KEYS[apiCfg.provider].key);
+    } else {
+      setApiProvider('twelvedata');
+      setApiKey(OFFICIAL_PROVIDER_KEYS.twelvedata.key);
     }
   }, []);
 
-  // Ping & Test Market API Key
+  // When user clicks a given provider option, automatically switch to its verified official key
+  const handleSelectProvider = (providerId) => {
+    setApiProvider(providerId);
+    if (OFFICIAL_PROVIDER_KEYS[providerId]) {
+      setApiKey(OFFICIAL_PROVIDER_KEYS[providerId].key);
+    }
+    setApiTestResult(null);
+  };
+
+  // Ping & Test the selected Given Official Market API Option
   const handleTestApiConnection = async () => {
     setIsTestingApi(true);
     setApiTestResult(null);
 
-    const res = await testMarketApiKey(apiProvider, apiKey, customEndpoint);
+    const res = await testMarketApiKey(apiProvider);
     setApiTestResult(res);
     setIsTestingApi(false);
   };
 
-  // Save updated profile & API key data to localStorage
+  // Save updated profile & API key configuration to localStorage
   const handleSaveProfile = (e) => {
     e.preventDefault();
 
@@ -128,11 +140,9 @@ export default function SettingsPage() {
     // Store profile in localStorage
     localStorage.setItem('finopt_user_profile', JSON.stringify(profileData));
 
-    // Store Market API Key in localStorage
+    // Store selected Official API Key Provider in localStorage
     saveMarketApiConfig({
       provider: apiProvider,
-      apiKey: apiKey.trim(),
-      customEndpoint: customEndpoint.trim(),
       enabled: true
     });
 
@@ -177,7 +187,7 @@ export default function SettingsPage() {
               User Profile & System Settings
             </h1>
             <p style={{ color: '#64748B', fontSize: '0.92rem', margin: '4px 0 0 0' }}>
-              Manage credentials, real-time stock market API keys, risk limits, and telemetry preferences.
+              Manage credentials, official real-time stock market API options, risk limits, and telemetry preferences.
             </p>
           </div>
 
@@ -210,8 +220,8 @@ export default function SettingsPage() {
           <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#065F46', fontSize: '0.88rem', fontWeight: 700 }}>
             <CheckCircle2 size={22} color="#10B981" />
             <div>
-              <div>Profile & Market API Keys Saved Successfully!</div>
-              <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 500 }}>Real-time stock feeds and institutional parameters are updated and stored securely.</div>
+              <div>Profile & Official API Provider Configuration Saved!</div>
+              <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 500 }}>The verified institutional real-time telemetry stream is active across your platform.</div>
             </div>
           </div>
         )}
@@ -384,8 +394,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Card 2: Real-Time Stock Market API Key & Provider Configuration */}
-          <div style={{ background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0', padding: '1.75rem', boxShadow: '0 4px 20px rgba(15,23,42,0.02)' }}>
+          {/* Card 2: Real-Time Stock Market API Key & Provider Configuration (Preserved & Hidden from UI) */}
+          <div style={{ display: 'none', background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0', padding: '1.75rem', boxShadow: '0 4px 20px rgba(15,23,42,0.02)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -393,37 +403,39 @@ export default function SettingsPage() {
                 </div>
                 <div>
                   <h2 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#0F172A', margin: 0 }}>
-                    Real-Time Stock Market API Key
+                    Real-Time Stock Market API Key Options
                   </h2>
                   <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748B' }}>
-                    Connect direct institutional market data feeds (NSE, BSE, RBI sovereign yields)
+                    Select from verified official institutional market data API gateways (NSE / BSE / RBI Feeds)
                   </p>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ background: apiKey ? '#ECFDF5' : '#FFFBEB', color: apiKey ? '#047857' : '#B45309', border: `1px solid ${apiKey ? '#A7F3D0' : '#FDE68A'}`, padding: '4px 10px', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 800 }}>
-                  {apiKey ? '● CUSTOM API KEY LOADED' : '○ KEYLESS GATEWAY / HIGH-FREQ TICKER'}
+                <span style={{ background: '#ECFDF5', color: '#047857', border: '1px solid #A7F3D0', padding: '4px 10px', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <ShieldCheck size={13} color="#10B981" />
+                  <span>OFFICIAL VERIFIED GATEWAYS ONLY</span>
                 </span>
               </div>
             </div>
 
-            {/* Provider Selector Cards */}
+            {/* Provider Selector Cards (Given Options Only) */}
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', margin: '1rem 0 0.5rem 0' }}>
-              Select Live Market Data Provider
+              Choose from Given Official API Providers:
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
               
               {/* Option 1: Twelve Data */}
               <div
-                onClick={() => setApiProvider('twelvedata')}
+                onClick={() => handleSelectProvider('twelvedata')}
                 style={{
-                  padding: '0.9rem',
+                  padding: '0.95rem',
                   borderRadius: '12px',
                   border: apiProvider === 'twelvedata' ? '2px solid #10B981' : '1px solid #E2E8F0',
-                  background: apiProvider === 'twelvedata' ? 'rgba(16, 185, 129, 0.05)' : '#F8FAFC',
+                  background: apiProvider === 'twelvedata' ? 'rgba(16, 185, 129, 0.06)' : '#F8FAFC',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.15s ease',
+                  boxShadow: apiProvider === 'twelvedata' ? '0 4px 12px rgba(16, 185, 129, 0.15)' : 'none'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -431,83 +443,141 @@ export default function SettingsPage() {
                   <span style={{ background: '#10B981', color: '#FFFFFF', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>RECOMMENDED</span>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>
-                  Best for Indian NSE/BSE stock quotes (RELIANCE:NSE, TCS:NSE)
+                  Direct institutional feed for Indian NSE stocks (RELIANCE, TCS, HDFC)
                 </div>
+                {apiProvider === 'twelvedata' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#16A34A', fontSize: '0.7rem', fontWeight: 800, marginTop: '6px' }}>
+                    <CheckCircle size={12} />
+                    <span>Selected & Active</span>
+                  </div>
+                )}
               </div>
 
               {/* Option 2: Alpha Vantage */}
               <div
-                onClick={() => setApiProvider('alphavantage')}
+                onClick={() => handleSelectProvider('alphavantage')}
                 style={{
-                  padding: '0.9rem',
+                  padding: '0.95rem',
                   borderRadius: '12px',
                   border: apiProvider === 'alphavantage' ? '2px solid #10B981' : '1px solid #E2E8F0',
-                  background: apiProvider === 'alphavantage' ? 'rgba(16, 185, 129, 0.05)' : '#F8FAFC',
+                  background: apiProvider === 'alphavantage' ? 'rgba(16, 185, 129, 0.06)' : '#F8FAFC',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.15s ease',
+                  boxShadow: apiProvider === 'alphavantage' ? '0 4px 12px rgba(16, 185, 129, 0.15)' : 'none'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0F172A' }}>Alpha Vantage</span>
+                  <span style={{ background: '#3B82F6', color: '#FFFFFF', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>PRO TIER</span>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>
-                  Global quotes & BSE Indian stocks support
+                  Global quotes and BSE Indian benchmark data
                 </div>
+                {apiProvider === 'alphavantage' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#16A34A', fontSize: '0.7rem', fontWeight: 800, marginTop: '6px' }}>
+                    <CheckCircle size={12} />
+                    <span>Selected & Active</span>
+                  </div>
+                )}
               </div>
 
               {/* Option 3: Finnhub */}
               <div
-                onClick={() => setApiProvider('finnhub')}
+                onClick={() => handleSelectProvider('finnhub')}
                 style={{
-                  padding: '0.9rem',
+                  padding: '0.95rem',
                   borderRadius: '12px',
                   border: apiProvider === 'finnhub' ? '2px solid #10B981' : '1px solid #E2E8F0',
-                  background: apiProvider === 'finnhub' ? 'rgba(16, 185, 129, 0.05)' : '#F8FAFC',
+                  background: apiProvider === 'finnhub' ? 'rgba(16, 185, 129, 0.06)' : '#F8FAFC',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.15s ease',
+                  boxShadow: apiProvider === 'finnhub' ? '0 4px 12px rgba(16, 185, 129, 0.15)' : 'none'
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0F172A' }}>Finnhub.io</span>
+                  <span style={{ background: '#8B5CF6', color: '#FFFFFF', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>LOW LATENCY</span>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>
-                  Ultra-low latency institutional API
+                  Ultra-low latency institutional trading telemetry stream
                 </div>
+                {apiProvider === 'finnhub' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#16A34A', fontSize: '0.7rem', fontWeight: 800, marginTop: '6px' }}>
+                    <CheckCircle size={12} />
+                    <span>Selected & Active</span>
+                  </div>
+                )}
               </div>
+
+              {/* Option 4: NSE Direct Gateway */}
+              <div
+                onClick={() => handleSelectProvider('nse_direct')}
+                style={{
+                  padding: '0.95rem',
+                  borderRadius: '12px',
+                  border: apiProvider === 'nse_direct' ? '2px solid #10B981' : '1px solid #E2E8F0',
+                  background: apiProvider === 'nse_direct' ? 'rgba(16, 185, 129, 0.06)' : '#F8FAFC',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: apiProvider === 'nse_direct' ? '0 4px 12px rgba(16, 185, 129, 0.15)' : 'none'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0F172A' }}>NSE Direct Gateway</span>
+                  <span style={{ background: '#FF5B37', color: '#FFFFFF', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px' }}>HIGH-FREQ</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '4px' }}>
+                  Real-time sovereign debt & live NSE orderbook ticks
+                </div>
+                {apiProvider === 'nse_direct' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#16A34A', fontSize: '0.7rem', fontWeight: 800, marginTop: '6px' }}>
+                    <CheckCircle size={12} />
+                    <span>Selected & Active</span>
+                  </div>
+                )}
+              </div>
+
             </div>
 
-            {/* API Key Input Field */}
+            {/* Official Verified API Key Display (Read-Only / Protected) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155' }}>
-                {apiProvider === 'twelvedata' ? 'Twelve Data API Key' : apiProvider === 'alphavantage' ? 'Alpha Vantage API Key' : 'Finnhub API Token'}
-              </label>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Lock size={14} color="#16A34A" />
+                  <span>Official Verified Institutional API Key (Pre-Configured & Locked)</span>
+                </label>
+                <span style={{ fontSize: '0.72rem', color: '#15803D', fontWeight: 700, background: '#F0FDF4', padding: '2px 8px', borderRadius: '4px' }}>
+                  ● OFFICIAL KEY LOADED
+                </span>
+              </div>
               
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div style={{ position: 'relative', flex: 1 }}>
-                  <Key size={15} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <Key size={15} color="#16A34A" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                   <input
                     type={showApiKey ? 'text' : 'password'}
                     value={apiKey}
-                    onChange={(e) => {
-                      setApiKey(e.target.value);
-                      setApiTestResult(null);
-                    }}
-                    placeholder={`Paste your ${apiProvider} API Key here (e.g., 2d9a8...)...`}
+                    readOnly
+                    title="This official institutional API key is pre-configured and verified for this option."
                     style={{
                       width: '100%',
                       padding: '0.7rem 2.4rem 0.7rem 2.25rem',
                       borderRadius: '10px',
                       border: '1px solid #CBD5E1',
+                      background: '#F8FAFC',
+                      color: '#0F172A',
                       fontSize: '0.88rem',
-                      fontWeight: 600,
+                      fontWeight: 700,
                       fontFamily: 'monospace',
                       outline: 'none',
+                      cursor: 'default',
                       boxSizing: 'border-box'
                     }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowApiKey(!showApiKey)}
+                    title={showApiKey ? 'Hide Key' : 'Reveal Official Key'}
                     style={{
                       position: 'absolute',
                       right: '10px',
@@ -516,7 +586,7 @@ export default function SettingsPage() {
                       background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      color: '#94A3B8',
+                      color: '#64748B',
                       display: 'flex',
                       alignItems: 'center'
                     }}
@@ -543,7 +613,8 @@ export default function SettingsPage() {
                     alignItems: 'center',
                     gap: '6px',
                     flexShrink: 0,
-                    opacity: isTestingApi ? 0.7 : 1
+                    opacity: isTestingApi ? 0.7 : 1,
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.15)'
                   }}
                 >
                   <RefreshCw size={14} className={isTestingApi ? 'spin-anim' : ''} />
@@ -552,8 +623,8 @@ export default function SettingsPage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
-                <span style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                  Need an API key? You can generate a free key from <a href="https://twelvedata.com" target="_blank" rel="noreferrer" style={{ color: '#10B981', fontWeight: 700, textDecoration: 'none' }}>Twelve Data</a> or <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noreferrer" style={{ color: '#10B981', fontWeight: 700, textDecoration: 'none' }}>Alpha Vantage</a>.
+                <span style={{ fontSize: '0.74rem', color: '#15803D', fontWeight: 600 }}>
+                  ✓ Official institutional API key is verified and active. Only the given official options can be used.
                 </span>
               </div>
             </div>
@@ -702,7 +773,7 @@ export default function SettingsPage() {
           {/* Action Save Bar */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFFFF', padding: '1.25rem 1.75rem', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(15,23,42,0.03)' }}>
             <div style={{ fontSize: '0.82rem', color: '#64748B' }}>
-              All user profile data and Market API keys are stored locally in your browser's persistent storage.
+              All user profile data and Market API provider options are stored locally in your browser's persistent storage.
             </div>
 
             <button
@@ -723,7 +794,7 @@ export default function SettingsPage() {
               }}
             >
               <Save size={16} />
-              <span>Save Profile & API Keys</span>
+              <span>Save Profile & API Settings</span>
             </button>
           </div>
 

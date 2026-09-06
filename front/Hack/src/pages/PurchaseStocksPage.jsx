@@ -13,6 +13,7 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { useRiskSafeguard } from '../context/RiskSafeguardContext';
+import { fetchWithAutoPort } from '../services/apiConfig';
 
 const TRADABLE_ASSETS = [
   { symbol: 'RELIANCE', name: 'Reliance Industries Ltd.', price: 3025.40, type: 'Large-Cap Energy & Tech', riskTier: 'Medium Risk', yieldEst: '15.4% Expected Return', exchange: 'NSE' },
@@ -59,30 +60,49 @@ export default function PurchaseStocksPage() {
     setOrderSuccess(null);
   };
 
-  const handleExecuteTrade = (e) => {
+  const handleExecuteTrade = async (e) => {
     e.preventDefault();
     if (shares <= 0) return;
 
     setIsExecuting(true);
     setOrderSuccess(null);
 
-    setTimeout(() => {
-      setIsExecuting(false);
-      const newOrder = {
-        id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-        timestamp: 'Just now',
-        symbol: selectedAsset.symbol,
-        side: orderSide.toUpperCase(),
-        shares: parseInt(shares),
-        price: effectivePrice,
-        total: totalOrderValue,
-        status: 'FILLED',
-      };
+    const newOrder = {
+      id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+      timestamp: 'Just now',
+      symbol: selectedAsset.symbol,
+      companyName: selectedAsset.name,
+      side: orderSide.toUpperCase(),
+      orderType: orderSide.toUpperCase(),
+      shares: parseInt(shares),
+      quantity: parseInt(shares),
+      price: effectivePrice,
+      total: totalOrderValue,
+      totalAmount: totalOrderValue,
+      status: 'FILLED',
+    };
 
-      setOrderHistory(prev => [newOrder, ...prev]);
-      setOrderSuccess(newOrder);
-      executeLiveOrder(newOrder);
-    }, 1200);
+    try {
+      await fetchWithAutoPort('/portfolios/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol: selectedAsset.symbol,
+          companyName: selectedAsset.name,
+          orderType: orderSide.toUpperCase(),
+          quantity: parseInt(shares),
+          price: effectivePrice,
+          totalAmount: totalOrderValue,
+        }),
+      });
+    } catch (err) {
+      console.warn('Backend order recording (offline fallback):', err);
+    }
+
+    setIsExecuting(false);
+    setOrderHistory(prev => [newOrder, ...prev]);
+    setOrderSuccess(newOrder);
+    executeLiveOrder(newOrder);
   };
 
   return (
@@ -150,8 +170,8 @@ export default function PurchaseStocksPage() {
                   >
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontWeight: 900, color: '#0F172A', fontSize: '0.95rem' }}>{asset.symbol}</span>
-                        <span style={{ fontSize: '0.72rem', background: '#E2E8F0', padding: '2px 5px', borderRadius: '4px', color: '#475569', fontWeight: 700 }}>{asset.exchange}</span>
+                        <span className="market-ticker-badge">{asset.symbol}</span>
+                        <span className="market-exchange-badge">{asset.exchange}</span>
                         <span style={{ fontSize: '0.75rem', color: '#64748B' }}>• {asset.type}</span>
                       </div>
                       <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: '2px' }}>
@@ -183,36 +203,20 @@ export default function PurchaseStocksPage() {
                 </h2>
                 
                 {/* Buy / Sell Tabs */}
-                <div style={{ display: 'flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', gap: '2px' }}>
+                <div className="segmented-filter-bar">
                   <button
                     type="button"
                     onClick={() => setOrderSide('buy')}
-                    style={{
-                      background: orderSide === 'buy' ? '#10B981' : 'transparent',
-                      color: orderSide === 'buy' ? '#FFFFFF' : '#64748B',
-                      border: 'none',
-                      padding: '0.35rem 0.85rem',
-                      borderRadius: '6px',
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
+                    className={`filter-tab-btn ${orderSide === 'buy' ? 'active-buy' : ''}`}
+                    style={{ padding: '0.35rem 0.85rem', fontWeight: 800 }}
                   >
                     BUY / ACCUMULATE
                   </button>
                   <button
                     type="button"
                     onClick={() => setOrderSide('sell')}
-                    style={{
-                      background: orderSide === 'sell' ? '#EF4444' : 'transparent',
-                      color: orderSide === 'sell' ? '#FFFFFF' : '#64748B',
-                      border: 'none',
-                      padding: '0.35rem 0.85rem',
-                      borderRadius: '6px',
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
+                    className={`filter-tab-btn ${orderSide === 'sell' ? 'active-sell' : ''}`}
+                    style={{ padding: '0.35rem 0.85rem', fontWeight: 800 }}
                   >
                     SELL / LIQUIDATE
                   </button>
@@ -397,7 +401,9 @@ export default function PurchaseStocksPage() {
                   <tr key={ord.id} style={{ borderBottom: '1px solid #F1F5F9', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFCFF' }}>
                     <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#0F172A' }}>{ord.id}</td>
                     <td style={{ padding: '0.85rem 1rem', color: '#64748B' }}>{ord.timestamp}</td>
-                    <td style={{ padding: '0.85rem 1rem', fontWeight: 800 }}>{ord.symbol}</td>
+                    <td style={{ padding: '0.85rem 1rem' }}>
+                      <span className="market-ticker-badge">{ord.symbol}</span>
+                    </td>
                     <td style={{ padding: '0.85rem 1rem' }}>
                       <span style={{ color: ord.side === 'BUY' ? '#10B981' : '#EF4444', fontWeight: 800 }}>
                         {ord.side}

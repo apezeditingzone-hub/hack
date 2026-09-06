@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { Dock, DockItem, DockIcon, DockLabel } from '../core/dock';
 import { getCurrentUser, logoutUser } from '../../services/authService';
+import RLogo from '../common/RLogo';
+import { useTheme } from '../../context/ThemeContext';
 
 // Bento Dashboard Icon matching reference design
 function DashboardBentoIcon({ size = 20, className = '', color = 'currentColor', strokeWidth = 2.2 }) {
@@ -148,11 +150,83 @@ function PortfolioBriefcaseIcon({ size = 20, className = '', color = 'currentCol
   );
 }
 
+// Live Market Financial Telemetry & Trendline Icon
+function LiveMarketIcon({ size = 18, className = '', color = 'currentColor', strokeWidth = 2.2 }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      style={{ display: 'block' }}
+    >
+      {/* Background Baseline Grid */}
+      <line 
+        x1="2" 
+        y1="19" 
+        x2="22" 
+        y2="19" 
+        stroke={color} 
+        strokeWidth="1.2" 
+        strokeDasharray="2 2" 
+        opacity="0.35" 
+      />
+
+      {/* Dynamic Rising Market Trendline */}
+      <path 
+        d="M2.5 14.5L7 10L11.5 13.5L17 6.5L21.5 9" 
+        stroke={color} 
+        strokeWidth={strokeWidth} 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+      />
+
+      {/* Live Active Red Blinking Beacon Peak Dot */}
+      <circle 
+        cx="17" 
+        cy="6.5" 
+        r="2.5" 
+        fill="#EF4444" 
+        className="live-red-beacon"
+      />
+
+      {/* Live Market Volume & Candlestick Columns */}
+      <path 
+        d="M5 19V16" 
+        stroke={color} 
+        strokeWidth={strokeWidth} 
+        strokeLinecap="round" 
+      />
+      <path 
+        d="M9 19V13.5" 
+        stroke={color} 
+        strokeWidth={strokeWidth} 
+        strokeLinecap="round" 
+      />
+      <path 
+        d="M13 19V15.5" 
+        stroke={color} 
+        strokeWidth={strokeWidth} 
+        strokeLinecap="round" 
+      />
+      <path 
+        d="M17 19V11.5" 
+        stroke={color} 
+        strokeWidth={strokeWidth} 
+        strokeLinecap="round" 
+      />
+    </svg>
+  );
+}
+
+
 export default function Navbar({ onOpenDemo, onOpenLogin }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme, setIsDarkMode } = useTheme();
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -228,12 +302,7 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
     {
       title: 'Live Market',
       path: '/live-market',
-      icon: <Activity size={20} strokeWidth={2} />
-    },
-    {
-      title: 'Purchase Stocks',
-      path: '/purchase-stocks',
-      icon: <Component size={20} strokeWidth={2} />
+      icon: <LiveMarketIcon size={20} strokeWidth={2} />
     },
     {
       title: 'Analytics',
@@ -260,106 +329,181 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
         left: 0,
         right: 0,
         width: '100%',
-        height: '74px',
+        height: '72px',
+        padding: '0 28px',
         zIndex: 150,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 32px',
-        boxSizing: 'border-box',
         background: isDarkMode 
-          ? (isScrolled ? 'rgba(15, 23, 42, 0.96)' : 'rgba(15, 23, 42, 0.88)') 
-          : (isScrolled ? 'rgba(255, 255, 255, 0.96)' : 'rgba(255, 255, 255, 0.88)'),
-        backdropFilter: 'blur(28px) saturate(190%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(190%)',
+          ? 'rgba(7, 11, 22, 0.88)' 
+          : 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderBottom: isDarkMode 
-          ? '1px solid rgba(255, 255, 255, 0.1)' 
+          ? '1px solid rgba(255, 255, 255, 0.08)' 
           : '1px solid rgba(226, 232, 240, 0.85)',
-        boxShadow: isScrolled 
-          ? '0 10px 30px -10px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.02)' 
-          : '0 2px 10px rgba(15, 23, 42, 0.03)',
-        transition: 'background 0.25s ease, box-shadow 0.25s ease, border-bottom 0.25s ease'
+        boxShadow: isDarkMode
+          ? '0 4px 24px rgba(0, 0, 0, 0.4)'
+          : '0 4px 20px rgba(15, 23, 42, 0.05)',
+        boxSizing: 'border-box'
       }}
     >
-      {/* 1. Left: RiskBlance Brand Name */}
+      {/* 1. Left Top Corner: Brand Title */}
       <div
         onClick={() => navigate('/dashboard')}
         style={{
           display: 'flex',
           alignItems: 'center',
+          padding: '4px 0',
+          background: 'transparent',
           cursor: 'pointer',
           textDecoration: 'none',
           userSelect: 'none',
-          background: 'transparent',
-          pointerEvents: 'auto',
-          transition: 'transform 0.15s ease',
+          transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
           flexShrink: 0
         }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.04)'}
         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
-        <span style={{ 
-          fontSize: '2.1rem', 
-          fontWeight: 900, 
-          color: isDarkMode ? '#F8FAFC' : '#09132E', 
-          letterSpacing: '-0.035em',
-          lineHeight: 1,
-          fontFamily: 'inherit'
-        }}>
-          Risk
-        </span>
-        <span style={{ 
-          fontSize: '2.1rem', 
-          fontWeight: 900, 
-          color: '#16A34A', 
-          letterSpacing: '-0.035em',
-          lineHeight: 1,
-          fontFamily: 'inherit'
-        }}>
-          Blance
-        </span>
+        {/* Brand Text */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: 900, 
+            color: isDarkMode ? '#F8FAFC' : '#09132E', 
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            fontFamily: 'inherit'
+          }}>
+            Risk
+          </span>
+          <span style={{ 
+            fontSize: '1.75rem', 
+            fontWeight: 900, 
+            color: '#16A34A', 
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            fontFamily: 'inherit'
+          }}>
+            Blance
+          </span>
+        </div>
       </div>
 
-      {/* 2. Middle: Dock Navigation Bar (Centered) */}
-      <div 
+      {/* 2. Center Island: Floating Navigation Links Pill Dock */}
+      <nav 
         style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'auto'
+          gap: '4px',
+          padding: '4px 8px',
+          height: '48px',
+          boxSizing: 'border-box',
+          background: isDarkMode 
+            ? 'rgba(15, 23, 42, 0.85)' 
+            : 'rgba(241, 245, 249, 0.9)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: '9999px',
+          border: isDarkMode 
+            ? '1px solid rgba(255, 255, 255, 0.1)' 
+            : '1px solid rgba(226, 232, 240, 0.9)',
+          boxShadow: isDarkMode
+            ? '0 4px 16px rgba(0, 0, 0, 0.3)'
+            : '0 2px 8px rgba(15, 23, 42, 0.05)',
+          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        <Dock orientation="horizontal" className="items-center">
-          {dockItems.map((item, idx) => {
-            const isActive = item.path && (location.pathname === item.path || 
-              (item.path === '/dashboard' && (location.pathname === '/landing' || location.pathname === '/home')));
+        {dockItems.map((item, idx) => {
+          const isActive = item.path && (location.pathname === item.path || 
+            (item.path === '/dashboard' && (location.pathname === '/landing' || location.pathname === '/home')));
 
-            return (
-              <DockItem
-                key={idx}
-                active={Boolean(isActive)}
-                onClick={() => {
-                  if (item.action) {
-                    item.action();
-                  } else if (item.path) {
-                    navigate(item.path);
-                  }
-                }}
-              >
-                <DockLabel>{item.title}</DockLabel>
-                <DockIcon>{item.icon}</DockIcon>
-              </DockItem>
-            );
-          })}
-        </Dock>
-      </div>
+          return (
+            <button
+              key={idx}
+              onClick={() => {
+                if (item.action) {
+                  item.action();
+                } else if (item.path) {
+                  navigate(item.path);
+                }
+              }}
+              style={{
+                background: isActive 
+                  ? (isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.06)')
+                  : 'transparent',
+                border: 'none',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '9999px',
+                color: isActive 
+                  ? (isDarkMode ? '#F8FAFC' : '#09132E') 
+                  : (isDarkMode ? '#94A3B8' : '#64748B'),
+                fontSize: '0.86rem',
+                fontWeight: isActive ? 800 : 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.15s ease',
+                userSelect: 'none',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = isDarkMode ? '#F8FAFC' : '#09132E';
+                  e.currentTarget.style.background = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(15, 23, 42, 0.03)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.color = isDarkMode ? '#94A3B8' : '#64748B';
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
+            >
+              {item.icon && (
+                <span style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  opacity: isActive ? 1 : 0.85,
+                  color: isActive && item.title === 'Live Market' ? '#EF4444' : 'inherit'
+                }}>
+                  {item.icon}
+                </span>
+              )}
+              <span>{item.title}</span>
+              {item.title === 'Live Market' && (
+                <span 
+                  className="live-market-red-dot"
+                  style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#EF4444',
+                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.95)',
+                    display: 'inline-block',
+                    marginLeft: '-1px',
+                    animation: 'liveRedBlink 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </nav>
 
-      {/* 3. Right: Utility Controls (Search, Dark Theme, Language) */}
+      {/* 3. Right: Separate Floating Utility Controls (Search, Theme Toggle, Language) */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
+          background: 'transparent',
           pointerEvents: 'auto',
           flexShrink: 0
         }}
@@ -369,18 +513,17 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
           style={{
             display: 'flex',
             alignItems: 'center',
-            background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+            background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(241, 245, 249, 0.95)',
             backdropFilter: 'blur(12px)',
-            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(218, 226, 237, 0.95)',
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
             borderRadius: '9999px',
-            padding: '7px 14px',
-            gap: '8px',
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            padding: '6px 12px',
+            gap: '6px',
             transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-            width: isSearchExpanded ? '210px' : '135px'
+            width: isSearchExpanded ? '160px' : '90px'
           }}
         >
-          <Search size={15} color={isDarkMode ? '#94A3B8' : '#64748B'} strokeWidth={2} />
+          <Search size={14} color={isDarkMode ? '#94A3B8' : '#64748B'} strokeWidth={2} />
           <input
             type="text"
             placeholder="Search..."
@@ -392,7 +535,7 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
               border: 'none',
               background: 'transparent',
               outline: 'none',
-              fontSize: '0.84rem',
+              fontSize: '0.8rem',
               fontWeight: 500,
               color: isDarkMode ? '#F8FAFC' : '#1E293B',
               width: '100%',
@@ -415,51 +558,35 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                 color: '#94A3B8'
               }}
             >
-              <X size={13} />
+              <X size={12} />
             </button>
           )}
         </div>
 
         {/* Theme Toggle Pill (Dark / Light) */}
         <button
-          onClick={() => setIsDarkMode(!isDarkMode)}
+          onClick={toggleTheme}
           title={isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '7px',
-            background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(12px)',
-            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(218, 226, 237, 0.95)',
-            padding: '7px 16px',
+            gap: '6px',
+            background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(241, 245, 249, 0.95)',
+            border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
+            padding: '6px 12px',
             borderRadius: '9999px',
             cursor: 'pointer',
             color: isDarkMode ? '#F8FAFC' : '#1E293B',
-            fontSize: '0.84rem',
-            fontWeight: 500,
-            boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+            fontSize: '0.8rem',
+            fontWeight: 600,
             transition: 'all 0.2s ease',
             userSelect: 'none'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.08)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 2px 8px rgba(15, 23, 42, 0.04)';
-          }}
         >
           {isDarkMode ? (
-            <>
-              <Sun size={15} color="#FBBF24" strokeWidth={2} />
-              <span>Light</span>
-            </>
+            <Sun size={14} color="#FBBF24" strokeWidth={2} />
           ) : (
-            <>
-              <Moon size={15} color="#1E293B" strokeWidth={2} />
-              <span>Dark</span>
-            </>
+            <Moon size={14} color="#1E293B" strokeWidth={2} />
           )}
         </button>
 
@@ -470,35 +597,25 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(255, 255, 255, 0.92)',
-              backdropFilter: 'blur(12px)',
-              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(218, 226, 237, 0.95)',
-              padding: '7px 15px',
+              gap: '4px',
+              background: isDarkMode ? 'rgba(30, 41, 59, 0.92)' : 'rgba(241, 245, 249, 0.95)',
+              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
+              padding: '6px 10px',
               borderRadius: '9999px',
               cursor: 'pointer',
               color: isDarkMode ? '#F8FAFC' : '#1E293B',
-              fontSize: '0.84rem',
-              fontWeight: 500,
-              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+              fontSize: '0.8rem',
+              fontWeight: 600,
               transition: 'all 0.2s ease',
               userSelect: 'none'
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.08)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(15, 23, 42, 0.04)';
-            }}
           >
-            <Globe size={16} color="#00A3E0" strokeWidth={2} />
-            <span style={{ fontWeight: 600 }}>{selectedLanguage}</span>
+            <Globe size={14} color="#00A3E0" strokeWidth={2} />
+            <span>{selectedLanguage}</span>
             <ChevronDown 
-              size={14} 
+              size={12} 
               color={isDarkMode ? '#94A3B8' : '#1E293B'} 
-              strokeWidth={2.2}
+              strokeWidth={2}
               style={{
                 transform: isLangDropdownOpen ? 'rotate(180deg)' : 'rotate(0)',
                 transition: 'transform 0.2s ease'
@@ -513,7 +630,7 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                 position: 'absolute',
                 top: 'calc(100% + 8px)',
                 right: 0,
-                minWidth: '150px',
+                minWidth: '140px',
                 background: isDarkMode ? 'rgba(30, 41, 59, 0.98)' : 'rgba(255, 255, 255, 0.98)',
                 backdropFilter: 'blur(16px)',
                 border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(226, 232, 240, 0.95)',
@@ -540,8 +657,8 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '7px 12px',
-                      borderRadius: '10px',
+                      padding: '6px 10px',
+                      borderRadius: '8px',
                       border: 'none',
                       background: isSelected 
                         ? (isDarkMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(0, 163, 224, 0.08)')
@@ -549,21 +666,15 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                       color: isSelected 
                         ? '#00A3E0' 
                         : (isDarkMode ? '#F1F5F9' : '#334155'),
-                      fontSize: '0.8rem',
+                      fontSize: '0.78rem',
                       fontWeight: isSelected ? 600 : 500,
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'background 0.15s ease'
                     }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(241, 245, 249, 0.8)';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected) e.currentTarget.style.background = 'transparent';
-                    }}
                   >
                     <span>{lang.name}</span>
-                    {isSelected && <Check size={13} color="#00A3E0" strokeWidth={2.5} />}
+                    {isSelected && <Check size={12} color="#00A3E0" strokeWidth={2.5} />}
                   </button>
                 );
               })}
@@ -782,7 +893,7 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  onClick={toggleTheme}
                   style={{
                     background: isDarkMode ? '#0F172A' : '#FFFFFF',
                     border: '1px solid #CBD5E1',
@@ -830,6 +941,37 @@ export default function Navbar({ onOpenDemo, onOpenLogin }) {
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes liveRedBlink {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.95), 0 0 3px rgba(239, 68, 68, 1);
+          }
+          50% {
+            opacity: 0.15;
+            transform: scale(0.75);
+            box-shadow: 0 0 2px rgba(239, 68, 68, 0.2);
+          }
+        }
+
+        .live-red-beacon {
+          animation: liveRedPulse 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+          transform-origin: 17px 6.5px;
+        }
+
+        @keyframes liveRedPulse {
+          0% {
+            opacity: 0.35;
+            transform: scale(0.8);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1.25);
+          }
+        }
+      `}</style>
     </header>
   );
 }

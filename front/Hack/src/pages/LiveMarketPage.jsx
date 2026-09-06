@@ -90,6 +90,7 @@ export default function LiveMarketPage() {
             <button
               onClick={() => navigate('/settings')}
               style={{
+                display: 'none',
                 background: apiConfig.apiKey ? '#F0FDF4' : '#F8FAFC',
                 color: apiConfig.apiKey ? '#15803D' : '#475569',
                 border: `1px solid ${apiConfig.apiKey ? '#BBF7D0' : '#CBD5E1'}`,
@@ -98,7 +99,6 @@ export default function LiveMarketPage() {
                 fontWeight: 700,
                 fontSize: '0.82rem',
                 cursor: 'pointer',
-                display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
                 transition: 'all 0.15s ease'
@@ -227,21 +227,13 @@ export default function LiveMarketPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', gap: '2px' }}>
+              <div className="segmented-filter-bar">
                 {['all', 'Equity', 'Fixed Income', 'Cash Reserve'].map((type) => (
                   <button
                     key={type}
+                    type="button"
                     onClick={() => setFilterType(type)}
-                    style={{
-                      background: filterType === type ? '#FFFFFF' : 'transparent',
-                      border: 'none',
-                      padding: '0.35rem 0.65rem',
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      fontWeight: filterType === type ? 800 : 600,
-                      color: filterType === type ? '#0F172A' : '#64748B',
-                      cursor: 'pointer',
-                    }}
+                    className={`filter-tab-btn ${filterType === type ? 'active' : ''}`}
                   >
                     {type === 'all' ? 'All Indian Assets' : type}
                   </button>
@@ -269,8 +261,8 @@ export default function LiveMarketPage() {
                   const isPositive = asset.change >= 0;
                   return (
                     <tr key={asset.symbol} style={{ borderBottom: '1px solid #F1F5F9', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFCFF' }}>
-                      <td style={{ padding: '1rem', fontWeight: 900, color: '#0F172A' }}>
-                        <span style={{ background: '#F1F5F9', padding: '3px 8px', borderRadius: '6px' }}>
+                      <td style={{ padding: '1rem', fontWeight: 900 }}>
+                        <span className="market-ticker-badge">
                           {asset.symbol}
                         </span>
                       </td>
